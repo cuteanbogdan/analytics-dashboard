@@ -1,6 +1,6 @@
 import amqplib, { Channel, Connection } from "amqplib";
 import { RABBITMQ_URL } from "./config";
-import { TrackingData } from "./types";
+import { TrackingData } from "shared-types/dist/trackingData";
 
 let channel: Channel;
 

@@ -1,28 +1,28 @@
 {
-  "name": "tracking-service",
+  "name": "data-processing-service",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "ts-node-dev src/index.ts"
+    "dev": "ts-node-dev src/index.ts",
+    "db:init": "ts-node src/db-init.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
-  "devDependencies": {
-    "@types/amqplib": "^0.10.5",
-    "@types/express": "^5.0.0",
-    "@types/node": "^22.8.1",
-    "ts-node": "^10.9.2",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.6.3"
-  },
   "dependencies": {
     "amqplib": "^0.10.4",
     "dotenv": "^16.4.5",
-    "express": "^4.21.1",
+    "pg": "^8.13.1",
     "shared-types": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.8.1",
+    "@types/pg": "^8.11.10",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.6.3"
   }
 }

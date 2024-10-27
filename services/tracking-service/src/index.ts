@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import { PORT } from "./config";
 import { connectToRabbitMQ, publishToQueue } from "./queue";
-import { TrackingData } from "./types";
+import { TrackingData } from "shared-types/dist/trackingData";
 
 const app = express();
 app.use(express.json());
