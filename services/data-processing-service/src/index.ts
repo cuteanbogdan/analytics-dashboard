@@ -1,8 +1,9 @@
 import { connectToRabbitMQ, consumeMessages } from "./queue";
-import { query } from "./db";
+import { checkConnection } from "shared-config/dist/db";
 
 const start = async () => {
   try {
+    await checkConnection("Data-Processing Service");
     await connectToRabbitMQ();
     await consumeMessages();
     console.log("Data Processing Service is up and running");

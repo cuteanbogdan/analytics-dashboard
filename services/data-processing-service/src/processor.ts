@@ -1,5 +1,5 @@
 import { TrackingData } from "shared-types/dist/trackingData";
-import { query } from "./db";
+import { query } from "shared-config/dist/db";
 
 export const processTrackingData = async (
   data: TrackingData
