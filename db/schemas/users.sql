@@ -4,6 +4,7 @@ CREATE TABLE users.accounts (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   email VARCHAR(255) UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
+  refresh_token TEXT,
   role VARCHAR(50) DEFAULT 'user',        
   status VARCHAR(50) DEFAULT 'active',  
   plan_tier VARCHAR(50) DEFAULT 'free',   
