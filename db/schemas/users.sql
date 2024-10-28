@@ -6,6 +6,7 @@ CREATE TABLE users.accounts (
   password_hash TEXT NOT NULL,
   role VARCHAR(50) DEFAULT 'user',        
   status VARCHAR(50) DEFAULT 'active',  
+  plan_tier VARCHAR(50) DEFAULT 'free',   
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   last_login TIMESTAMP
 );
@@ -16,6 +17,5 @@ CREATE TABLE users.sites (
   site_name VARCHAR(255) NOT NULL,
   site_url TEXT NOT NULL,
   tracking_id UUID UNIQUE NOT NULL DEFAULT uuid_generate_v4(),
-  plan_tier VARCHAR(50) DEFAULT 'free',   
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
