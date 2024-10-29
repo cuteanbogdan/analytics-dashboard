@@ -54,8 +54,8 @@ export const processPageViews = async (data: TrackingData): Promise<void> => {
         data.pageUrl,
         1,
         isUniqueVisitor ? 1 : 0,
-        calculateAverageTimeOnPage(0, 1),
-        calculateBounceRate(1, isUniqueVisitor ? 1 : 0),
+        await calculateAverageTimeOnPage(data.trackingId, data.pageUrl),
+        await calculateBounceRate(data.trackingId, data.pageUrl),
         new Date(),
       ]
     );
@@ -79,21 +79,65 @@ async function isNewVisitor(
   return result.rows[0].count === "0";
 }
 
-function calculateAverageTimeOnPage(
-  previousAvg: number,
-  totalViews: number
-): number {
-  // Placeholder logic to calculate the average time on page
-  const simulatedVisitDuration = 120; // Simulated visit duration in seconds
-  return (previousAvg * (totalViews - 1) + simulatedVisitDuration) / totalViews;
+async function calculateAverageTimeOnPage(
+  trackingId: string,
+  pageUrl: string
+): Promise<number> {
+  const result = await query(
+    `
+    SELECT EXTRACT(EPOCH FROM (session_end - session_start)) AS session_duration
+    FROM analytics.page_sessions
+    WHERE tracking_id = $1 AND page_url = $2 AND session_end IS NOT NULL
+  `,
+    [trackingId, pageUrl]
+  );
+
+  const sessionDurations = result.rows.map(
+    (row: any) => row.session_duration || 0
+  );
+  const totalDuration = sessionDurations.reduce(
+    (sum, duration) => sum + duration,
+    0
+  );
+  const averageTime =
+    sessionDurations.length > 0 ? totalDuration / sessionDurations.length : 0;
+
+  return averageTime;
 }
 
-function calculateBounceRate(
-  viewsCount: number,
-  uniqueVisitors: number
-): number {
-  // Placeholder logic to calculate bounce rate as a percentage
-  // Bounce rate formula: (Single-page visits / Total visits) * 100
-  const singlePageVisits = Math.max(uniqueVisitors - 1, 0); // Simulate single-page visits
-  return (singlePageVisits / viewsCount) * 100;
+async function calculateBounceRate(
+  trackingId: string,
+  pageUrl: string
+): Promise<number> {
+  // Count single-page sessions (sessions with only one page view)
+  const singlePageResult = await query(
+    `
+    SELECT COUNT(*) AS single_page_visits
+    FROM analytics.page_sessions
+    WHERE tracking_id = $1 AND page_url = $2 AND session_end IS NOT NULL
+  `,
+    [trackingId, pageUrl]
+  );
+  const singlePageVisits = parseInt(
+    singlePageResult.rows[0].single_page_visits,
+    10
+  );
+
+  const totalSessionsResult = await query(
+    `
+    SELECT COUNT(*) AS total_sessions
+    FROM analytics.page_sessions
+    WHERE tracking_id = $1 AND page_url = $2
+  `,
+    [trackingId, pageUrl]
+  );
+  const totalSessions = parseInt(
+    totalSessionsResult.rows[0].total_sessions,
+    10
+  );
+
+  const bounceRate =
+    totalSessions > 0 ? (singlePageVisits / totalSessions) * 100 : 0;
+
+  return bounceRate;
 }
