@@ -76,24 +76,3 @@ export const refreshToken = async (
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
-export const validateToken = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  const token = req.cookies["jwt-token"];
-
-  if (!token) {
-    res.sendStatus(401);
-    return;
-  }
-
-  const decoded = await verifyToken(token, "access");
-
-  if (!decoded) {
-    res.sendStatus(403);
-    return;
-  }
-
-  res.json({ user: decoded });
-};
