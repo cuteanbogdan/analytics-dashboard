@@ -1,6 +1,6 @@
 import amqplib, { Channel, Connection } from "amqplib";
 import { RABBITMQ_URL, QUEUE_NAME } from "./config";
-import { processTrackingData } from "./processor";
+import { processTrackingData } from "./processes/processTrackingData";
 
 let channel: Channel;
 
