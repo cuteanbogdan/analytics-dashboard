@@ -1,0 +1,57 @@
+type PageView {
+  id: ID!
+  trackingId: String!
+  pageUrl: String!
+  viewsCount: Int!
+  uniqueVisitors: Int!
+  averageTimeOnPage: Float
+  bounceRate: Float
+  timestamp: String!
+}
+
+type VisitorStat {
+  id: ID!
+  trackingId: String!
+  visitorId: String!
+  deviceType: String
+  location: Location
+  visitCount: Int!
+  firstVisit: String!
+  lastVisit: String!
+}
+
+type Location {
+  country: String
+  city: String
+}
+
+type PageSession {
+  id: ID!
+  trackingId: String!
+  pageUrl: String!
+  sessionStart: String!
+  sessionEnd: String
+  sessionDuration: Float
+}
+
+type Query {
+  pageViews(
+    trackingId: String
+    startDate: String
+    endDate: String
+    top: Int
+  ): [PageView]
+  visitorStats(
+    trackingId: String
+    location: Boolean
+    newVisitors: Boolean
+  ): [VisitorStat]
+  bounceRate(trackingId: String): Float
+  averageTimeOnPage(trackingId: String): Float
+  pageSessions(
+    trackingId: String!
+    pageUrl: String
+    startDate: String
+    endDate: String
+  ): [PageSession]
+}
