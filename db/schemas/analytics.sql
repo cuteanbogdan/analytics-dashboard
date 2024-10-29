@@ -19,3 +19,11 @@ CREATE TABLE analytics.visitor_stats (
   first_visit TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   last_visit TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE analytics.page_sessions (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  tracking_id UUID REFERENCES users.sites(tracking_id) ON DELETE CASCADE,
+  page_url TEXT,
+  session_start TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  session_end TIMESTAMP
+);
