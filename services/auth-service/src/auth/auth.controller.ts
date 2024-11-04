@@ -12,7 +12,10 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
 
   try {
-    const result = await query("SELECT * FROM users WHERE email = $1", [email]);
+    const result = await query(
+      "SELECT * FROM users.accounts WHERE email = $1",
+      [email]
+    );
     const user = result.rows[0];
 
     if (!user || !(await validatePassword(password, user.password_hash))) {
@@ -23,7 +26,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const accessToken = generateAccessToken({ id: user.id, role: user.role });
     const refreshToken = generateRefreshToken({ id: user.id });
 
-    await query("UPDATE users SET refresh_token = $1 WHERE id = $2", [
+    await query("UPDATE users.accounts SET refresh_token = $1 WHERE id = $2", [
       refreshToken,
       user.id,
     ]);
@@ -45,12 +48,13 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const register = async (req: Request, res: Response): Promise<void> => {
-  const { full_name, email, password } = req.body;
+  const { fullName, email, password } = req.body;
 
   try {
-    const existingUser = await query("SELECT * FROM users WHERE email = $1", [
-      email,
-    ]);
+    const existingUser = await query(
+      "SELECT * FROM users.accounts WHERE email = $1",
+      [email]
+    );
     if ((existingUser.rowCount ?? 0) > 0) {
       res.status(400).json({ message: "Email already in use" });
       return;
@@ -60,17 +64,17 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     const result = await query(
       `
-      INSERT INTO users (full_name, email, password_hash)
+      INSERT INTO users.accounts (full_name, email, password_hash)
       VALUES ($1, $2, $3) RETURNING id, role
       `,
-      [full_name, email, passwordHash]
+      [fullName, email, passwordHash]
     );
     const user = result.rows[0];
 
     const accessToken = generateAccessToken({ id: user.id, role: user.role });
     const refreshToken = generateRefreshToken({ id: user.id });
 
-    await query("UPDATE users SET refresh_token = $1 WHERE id = $2", [
+    await query("UPDATE users.accounts SET refresh_token = $1 WHERE id = $2", [
       refreshToken,
       user.id,
     ]);
@@ -104,9 +108,10 @@ export const refreshToken = async (
   }
 
   try {
-    const result = await query("SELECT * FROM users WHERE refresh_token = $1", [
-      refreshToken,
-    ]);
+    const result = await query(
+      "SELECT * FROM users.accounts WHERE refresh_token = $1",
+      [refreshToken]
+    );
     const user = result.rows[0];
 
     if (!user) {
