@@ -1,7 +1,7 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import { login, refreshToken, register } from "./auth/auth.controller";
+import { login, logout, refreshToken, register } from "./auth/auth.controller";
 import passport from "./auth/passportConfig";
 import { authenticateToken } from "./auth/auth.service";
 import { checkConnection } from "shared-config/dist/db";
@@ -23,8 +23,9 @@ const startServer = async () => {
       })
     );
 
-    app.post("/login", login);
-    app.post("/register", register);
+    app.post("/auth/login", login);
+    app.post("/auth/register", register);
+    app.post("/auth/logout", logout);
     app.post("/auth/refresh-token", refreshToken);
 
     app.get("/auth/validate-token", authenticateToken, (req, res) => {
