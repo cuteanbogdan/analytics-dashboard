@@ -1,8 +1,9 @@
+"use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAppDispatch } from "@/redux/hooks";
+import { loginAsync } from "@/redux/slices/authSlice";
 import axios from "axios";
-import { useRouter } from "next/router";
-import { useDispatch } from "react-redux";
-import { login } from "@/redux/slices/authSlice";
 
 interface RegisterFormData {
   fullName: string;
@@ -19,7 +20,7 @@ const Register: React.FC = () => {
     confirmPassword: "",
   });
   const [error, setError] = useState<string | null>(null);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,13 +48,19 @@ const Register: React.FC = () => {
       );
 
       if (response.status === 201) {
-        const { user, accessToken } = response.data;
-        dispatch(login({ user, accessToken }));
-        router.push("/dashboard");
+        const resultAction = await dispatch(
+          loginAsync({ email: formData.email, password: formData.password })
+        );
+
+        if (loginAsync.fulfilled.match(resultAction)) {
+          router.push("/");
+        } else {
+          setError("Registration succeeded, but login failed.");
+        }
       }
     } catch (err) {
-      setError("Registration failed. Please try again.");
       console.error("Registration error:", err);
+      setError("Registration failed. Please try again.");
     }
   };
 

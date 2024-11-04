@@ -1,8 +1,8 @@
+"use client";
 import React, { useState } from "react";
-import axios from "axios";
-import { useRouter } from "next/router";
-import { login } from "@/redux/slices/authSlice";
-import { useDispatch } from "react-redux";
+import { useRouter } from "next/navigation";
+import { loginAsync } from "@/redux/slices/authSlice";
+import { useAppDispatch } from "@/redux/hooks";
 
 interface LoginFormData {
   email: string;
@@ -16,7 +16,7 @@ const Login: React.FC = () => {
   });
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -28,19 +28,16 @@ const Login: React.FC = () => {
     setError(null);
 
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/login`,
-        formData
-      );
+      const resultAction = await dispatch(loginAsync(formData));
 
-      if (response.status === 200) {
-        const { user, accessToken } = response.data;
-        dispatch(login({ user, accessToken }));
-        router.push("/dashboard");
+      if (loginAsync.fulfilled.match(resultAction)) {
+        router.push("/");
+      } else {
+        setError("Invalid email or password.");
       }
     } catch (err) {
-      setError("Invalid email or password.");
       console.error("Login error:", err);
+      setError("Login failed. Please try again.");
     }
   };
 
