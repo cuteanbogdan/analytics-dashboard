@@ -1,6 +1,6 @@
 import express from "express";
 import cookieParser from "cookie-parser";
-import { login, refreshToken } from "./auth/auth.controller";
+import { login, refreshToken, register } from "./auth/auth.controller";
 import passport from "./auth/passportConfig";
 import { authenticateToken } from "./auth/auth.service";
 
@@ -10,7 +10,9 @@ app.use(cookieParser());
 app.use(passport.initialize());
 
 app.post("/login", login);
+app.post("/register", register);
 app.post("/auth/refresh-token", refreshToken);
+
 app.get("/auth/validate-token", authenticateToken, (req, res) => {
   res.status(200).json({ user: req.user });
 });
