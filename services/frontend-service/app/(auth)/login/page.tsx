@@ -1,13 +1,59 @@
-import React from "react";
+import React, { useState } from "react";
+import axios from "axios";
+import { useRouter } from "next/router";
+import { login } from "@/redux/slices/authSlice";
+import { useDispatch } from "react-redux";
 
-const Login = () => {
+interface LoginFormData {
+  email: string;
+  password: string;
+}
+
+const Login: React.FC = () => {
+  const [formData, setFormData] = useState<LoginFormData>({
+    email: "",
+    password: "",
+  });
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const dispatch = useDispatch();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/login`,
+        formData
+      );
+
+      if (response.status === 200) {
+        const { user, accessToken } = response.data;
+        dispatch(login({ user, accessToken }));
+        router.push("/dashboard");
+      }
+    } catch (err) {
+      setError("Invalid email or password.");
+      console.error("Login error:", err);
+    }
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
           Welcome to NextGen Analytics
         </h2>
-        <form className="space-y-6">
+        {error && (
+          <p className="text-red-500 text-center text-sm mb-4">{error}</p>
+        )}
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label
               htmlFor="email"
@@ -18,6 +64,8 @@ const Login = () => {
             <input
               type="email"
               id="email"
+              value={formData.email}
+              onChange={handleChange}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               placeholder="you@example.com"
               required
@@ -33,6 +81,8 @@ const Login = () => {
             <input
               type="password"
               id="password"
+              value={formData.password}
+              onChange={handleChange}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               placeholder="********"
               required

@@ -30,7 +30,14 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
     res.cookie("jwt-token", accessToken, { httpOnly: true, secure: true });
     res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true });
-    res.json({ accessToken });
+
+    res.json({
+      user: {
+        id: user.id,
+        email: user.email,
+      },
+      accessToken,
+    });
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -71,9 +78,14 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     res.cookie("jwt-token", accessToken, { httpOnly: true, secure: true });
     res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true });
 
-    res
-      .status(201)
-      .json({ message: "User registered successfully", accessToken });
+    res.status(201).json({
+      message: "User registered successfully",
+      accessToken,
+      user: {
+        id: user.id,
+        email: user.email,
+      },
+    });
   } catch (error) {
     console.error("Registration error:", error);
     res.status(500).json({ message: "Internal server error" });
