@@ -121,6 +121,10 @@ export const refreshToken = async (
 
     const decoded = await verifyToken(refreshToken, "refresh");
     if (!decoded) {
+      await query(
+        "UPDATE users.accounts SET refresh_token = NULL WHERE id = $1",
+        [user.id]
+      );
       res.sendStatus(403);
       return;
     }
