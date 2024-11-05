@@ -1,5 +1,9 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import {
+  loginService,
+  refreshTokenService,
+  logoutService,
+} from "@/services/authService";
 
 interface User {
   id: string;
@@ -26,12 +30,11 @@ export const loginAsync = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/auth/login`,
-        credentials,
-        { withCredentials: true }
-      );
-      return response.data.user;
+      const response = await loginService(credentials);
+      return {
+        user: response.data.user,
+        accessToken: response.data.accessToken,
+      };
     } catch (error) {
       return rejectWithValue("Failed to login");
     }
@@ -42,12 +45,8 @@ export const refreshAuthState = createAsyncThunk(
   "auth/refresh",
   async (_, { dispatch, rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/auth/refresh-token`,
-        null,
-        { withCredentials: true }
-      );
-      return response.data;
+      const response = await refreshTokenService();
+      return response.data.accessToken;
     } catch (error: any) {
       if (error.response?.status === 401 || error.response?.status === 403) {
         dispatch(logoutAsync());
@@ -61,14 +60,7 @@ export const logoutAsync = createAsyncThunk(
   "auth/logout",
   async (_, { dispatch }) => {
     try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/auth/logout`,
-        null,
-        {
-          withCredentials: true,
-        }
-      );
-
+      await logoutService();
       dispatch(resetAuthState());
     } catch (error) {
       console.error("Logout error:", error);
@@ -98,7 +90,7 @@ const authSlice = createSlice({
       )
       .addCase(refreshAuthState.fulfilled, (state, action) => {
         state.isAuthenticated = true;
-        state.accessToken = action.payload.accessToken;
+        state.accessToken = action.payload;
       });
   },
 });
