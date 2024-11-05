@@ -8,6 +8,8 @@ import {
 } from "./auth.service";
 import { query } from "shared-config/dist/db";
 
+const isProduction = process.env.NODE_ENV === "production";
+
 export const login = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
 
@@ -31,8 +33,16 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       user.id,
     ]);
 
-    res.cookie("jwt-token", accessToken, { httpOnly: true, secure: true });
-    res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true });
+    res.cookie("jwt-token", accessToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+    });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+    });
 
     res.json({
       user: {
@@ -79,8 +89,16 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       user.id,
     ]);
 
-    res.cookie("jwt-token", accessToken, { httpOnly: true, secure: true });
-    res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true });
+    res.cookie("jwt-token", accessToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+    });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+    });
 
     res.status(201).json({
       message: "User registered successfully",
@@ -134,7 +152,11 @@ export const refreshToken = async (
       role: user.role,
     });
 
-    res.cookie("jwt-token", newAccessToken, { httpOnly: true, secure: true });
+    res.cookie("jwt-token", newAccessToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+    });
     res.sendStatus(200);
   } catch (error) {
     console.error("Refresh token error:", error);
@@ -144,8 +166,16 @@ export const refreshToken = async (
 
 export const logout = async (req: Request, res: Response): Promise<void> => {
   try {
-    res.clearCookie("jwt-token", { httpOnly: true, secure: true });
-    res.clearCookie("refreshToken", { httpOnly: true, secure: true });
+    res.clearCookie("jwt-token", {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+    });
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+    });
 
     res.status(200).json({ message: "Successfully logged out" });
   } catch (error) {
