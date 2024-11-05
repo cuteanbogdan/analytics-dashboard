@@ -157,7 +157,7 @@ export const refreshToken = async (
       secure: isProduction,
       sameSite: isProduction ? "none" : "lax",
     });
-    res.sendStatus(200);
+    res.status(200).json({ accessToken: newAccessToken });
   } catch (error) {
     console.error("Refresh token error:", error);
     res.status(500).json({ message: "Internal server error" });

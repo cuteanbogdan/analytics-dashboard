@@ -8,6 +8,7 @@ import typeDefs from "./schema";
 import { resolvers } from "./resolvers";
 import { authenticateToken } from "shared-config/dist/auth.middleware";
 import cookieParser from "cookie-parser";
+import { checkConnection } from "shared-config/dist/db";
 
 dotenv.config();
 
@@ -22,6 +23,8 @@ const server = new ApolloServer({
 });
 
 async function startServer() {
+  await checkConnection("Analytics-API-Service");
+
   await server.start();
   app.use(
     "/api/analytics",

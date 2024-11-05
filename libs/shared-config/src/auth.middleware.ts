@@ -6,10 +6,9 @@ export const authenticateToken = (
   res: Response,
   next: NextFunction
 ): void => {
-  const token =
-    req.cookies["jwt-token"] || req.headers["authorization"]?.split(" ")[1];
+  const cookies = req.headers.cookie;
 
-  if (!token) {
+  if (!cookies) {
     res.sendStatus(401);
     return;
   }
@@ -17,7 +16,7 @@ export const authenticateToken = (
   axios
     .get(`${process.env.AUTH_SERVICE_URL}/auth/validate-token`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        Cookie: cookies,
       },
       withCredentials: true,
     })

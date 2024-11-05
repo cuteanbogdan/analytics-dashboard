@@ -17,7 +17,9 @@ const startServer = async () => {
 
     app.use(
       cors({
-        origin: process.env.FRONTEND_SERVICE_URL || "http://localhost:3000",
+        origin:
+          process.env.FRONTEND_SERVICE_URL ||
+          process.env.ANALYTICS_API_SERVICE_URL,
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE"],
       })
