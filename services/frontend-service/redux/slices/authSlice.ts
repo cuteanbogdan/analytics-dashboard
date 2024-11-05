@@ -28,7 +28,8 @@ export const loginAsync = createAsyncThunk(
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/auth/login`,
-        credentials
+        credentials,
+        { withCredentials: true }
       );
       return response.data.user;
     } catch (error) {
