@@ -39,7 +39,7 @@ export const loginAsync = createAsyncThunk(
 
 export const refreshAuthState = createAsyncThunk(
   "auth/refresh",
-  async (_, { rejectWithValue }) => {
+  async (_, { dispatch, rejectWithValue }) => {
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/auth/refresh-token`,
@@ -47,7 +47,10 @@ export const refreshAuthState = createAsyncThunk(
         { withCredentials: true }
       );
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        dispatch(logoutAsync());
+      }
       return rejectWithValue("Failed to refresh token");
     }
   }
@@ -95,11 +98,6 @@ const authSlice = createSlice({
       .addCase(refreshAuthState.fulfilled, (state, action) => {
         state.isAuthenticated = true;
         state.accessToken = action.payload.accessToken;
-      })
-      .addCase(logoutAsync.fulfilled, (state) => {
-        state.isAuthenticated = false;
-        state.user = null;
-        state.accessToken = null;
       });
   },
 });
