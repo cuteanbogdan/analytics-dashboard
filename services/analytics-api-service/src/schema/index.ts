@@ -1,9 +1,17 @@
 import { readFileSync } from "fs";
 import { join } from "path";
-import gql from "graphql-tag";
+import { mergeTypeDefs } from "@graphql-tools/merge";
+import { DocumentNode } from "graphql";
 
-const typeDefs = gql(
-  readFileSync(join(__dirname, "analytics.graphql"), "utf8")
+const analyticsSchema = readFileSync(
+  join(__dirname, "analytics.graphql"),
+  "utf8"
 );
+const websitesSchema = readFileSync(
+  join(__dirname, "websites.graphql"),
+  "utf8"
+);
+
+const typeDefs: DocumentNode = mergeTypeDefs([analyticsSchema, websitesSchema]);
 
 export default typeDefs;

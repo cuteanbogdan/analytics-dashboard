@@ -1,0 +1,20 @@
+type Website {
+  id: ID!
+  user_id: ID!
+  site_name: String!
+  site_url: String!
+  tracking_id: String!
+  active: Boolean!
+  last_active_date: String
+  created_at: String
+}
+
+type Query {
+  getWebsites: [Website!]!
+  getWebsiteByID(id: ID!): Website
+}
+
+type Mutation {
+  addWebsite(site_name: String!, site_url: String!): Website!
+  checkWebsiteStatus(id: ID!): Website!
+}

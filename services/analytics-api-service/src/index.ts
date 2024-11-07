@@ -29,9 +29,10 @@ async function startServer() {
   app.use(
     "/api/analytics",
     cors<cors.CorsRequest>(),
-    bodyParser.json(),
     expressMiddleware(server, {
-      context: async ({ req }) => ({ req }),
+      context: async ({ req }) => ({
+        user: req.user,
+      }),
     })
   );
 

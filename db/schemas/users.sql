@@ -21,5 +21,7 @@ CREATE TABLE users.sites (
   site_name VARCHAR(255) NOT NULL,
   site_url TEXT NOT NULL,
   tracking_id UUID UNIQUE NOT NULL DEFAULT uuid_generate_v4(),
+  active BOOLEAN DEFAULT FALSE,
+  last_active_date TIMESTAMP,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
