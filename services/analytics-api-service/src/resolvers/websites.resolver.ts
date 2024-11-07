@@ -35,11 +35,29 @@ export const websitesResolvers = {
 
       const userId = context.user.id;
 
+      let sanitizedUrl;
+      try {
+        const url = new URL(site_url);
+        url.pathname = url.pathname.replace(/\/+$/, "");
+        sanitizedUrl = url.href.toLowerCase();
+      } catch (e) {
+        throw new Error("Invalid URL format");
+      }
+
+      const duplicateCheck = await query(
+        `SELECT * FROM users.sites WHERE site_url = $2`,
+        [sanitizedUrl]
+      );
+
+      if (duplicateCheck.rows.length > 0) {
+        throw new Error("A website with this URL already exists");
+      }
+
       const result = await query(
         `INSERT INTO users.sites (user_id, site_name, site_url) 
              VALUES ($1, $2, $3) 
              RETURNING *`,
-        [userId, site_name, site_url]
+        [userId, site_name, sanitizedUrl]
       );
 
       return result.rows[0];
