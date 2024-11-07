@@ -25,7 +25,15 @@ export const authenticateToken = (
       next();
     })
     .catch((error) => {
-      console.error("Token validation failed:", error);
-      res.sendStatus(403);
+      console.log(error);
+      if (
+        error.response &&
+        error.response.status === 401 &&
+        error.response.data.message === "Token expired"
+      ) {
+        res.status(401).json({ message: "Token expired" });
+      } else {
+        res.status(403).json({ message: "Unauthorized access" });
+      }
     });
 };
