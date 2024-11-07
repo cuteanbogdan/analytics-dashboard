@@ -1,7 +1,8 @@
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt, { JwtPayload, TokenExpiredError } from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import passport from "./passportConfig";
+import { Request, Response, NextFunction } from "express";
 
 dotenv.config();
 
@@ -45,6 +46,28 @@ export const verifyToken = (
   });
 };
 
-export const authenticateToken = passport.authenticate("jwt", {
-  session: false,
-});
+export const authenticateToken = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  passport.authenticate(
+    "jwt",
+    { session: false },
+    (err: Error | null, user: JwtPayload | false, info: unknown) => {
+      if (err) {
+        return res.status(500).json({ message: "Server error" });
+      }
+
+      if (!user) {
+        if (info instanceof TokenExpiredError) {
+          return res.status(401).json({ message: "Token expired" });
+        }
+        return res.status(403).json({ message: "Unauthorized" });
+      }
+
+      req.user = user;
+      next();
+    }
+  )(req, res, next);
+};
