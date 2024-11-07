@@ -13,6 +13,14 @@ import { checkConnection } from "shared-config/dist/db";
 dotenv.config();
 
 const app = express();
+
+app.use(
+  cors({
+    origin: process.env.FRONTEND_SERVICE_URL,
+    credentials: true,
+  })
+);
+
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(authenticateToken);
@@ -28,7 +36,6 @@ async function startServer() {
   await server.start();
   app.use(
     "/api/analytics",
-    cors<cors.CorsRequest>(),
     expressMiddleware(server, {
       context: async ({ req }) => ({
         user: req.user,
