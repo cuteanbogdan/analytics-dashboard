@@ -31,7 +31,7 @@ const Login: React.FC = () => {
       const resultAction = await dispatch(loginAsync(formData));
 
       if (loginAsync.fulfilled.match(resultAction)) {
-        router.push("/");
+        router.push("/dashboard");
       } else {
         setError("Invalid email or password.");
       }
