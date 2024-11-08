@@ -20,9 +20,9 @@ const geistMono = localFont({
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <body
@@ -31,6 +31,11 @@ export default function RootLayout({
         <ApolloProvider client={client}>
           <Provider store={store}>{children}</Provider>
         </ApolloProvider>
+        {/* Example of running tracking service */}
+        <script
+          src="http://localhost:3000/tracking.js?tracking_id=UNIQUE_TRACKING_ID"
+          defer
+        ></script>
       </body>
     </html>
   );
