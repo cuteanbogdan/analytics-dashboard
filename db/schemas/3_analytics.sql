@@ -1,3 +1,7 @@
+CREATE SCHEMA IF NOT EXISTS analytics;
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 CREATE TABLE analytics.page_views (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   tracking_id UUID REFERENCES users.sites(tracking_id) ON DELETE CASCADE,
