@@ -1,9 +1,26 @@
 import express, { Request, Response } from "express";
+import cors from "cors";
 import { PORT } from "./config";
 import { connectToRabbitMQ, publishToQueue } from "./queue";
 import { TrackingData } from "shared-types/dist/trackingData";
 
 const app = express();
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (origin) {
+        callback(null, origin); // Allow dynamic origins
+      } else {
+        callback(null, "*"); // Allow non-origin requests
+      }
+    },
+    credentials: true,
+    methods: ["POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type"],
+  })
+);
+
 app.use(express.json());
 
 const TRACKING_QUEUE = "tracking_data_queue";
