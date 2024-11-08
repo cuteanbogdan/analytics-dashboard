@@ -37,7 +37,7 @@ async function startServer() {
   app.use(
     "/api/analytics",
     expressMiddleware(server, {
-      context: async ({ req }) => ({
+      context: async ({ req }: { req: express.Request }) => ({
         user: req.user,
       }),
     })

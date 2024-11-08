@@ -45,7 +45,7 @@ export const websitesResolvers = {
       }
 
       const duplicateCheck = await query(
-        `SELECT * FROM users.sites WHERE site_url = $2`,
+        `SELECT * FROM users.sites WHERE site_url = $1`,
         [sanitizedUrl]
       );
 
