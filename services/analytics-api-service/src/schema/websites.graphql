@@ -16,5 +16,4 @@ type Query {
 
 type Mutation {
   addWebsite(site_name: String!, site_url: String!): Website!
-  checkWebsiteStatus(id: ID!): Website!
 }

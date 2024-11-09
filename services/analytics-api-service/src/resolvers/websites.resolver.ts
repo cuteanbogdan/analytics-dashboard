@@ -87,35 +87,5 @@ export const websitesResolvers = {
 
       return result.rows[0];
     },
-
-    checkWebsiteStatus: async (
-      // template only
-      _: unknown,
-      { id }: { id: string },
-      context: { user?: { id: string } }
-    ) => {
-      if (!context.user || !context.user.id) {
-        throw new Error("User not authenticated");
-      }
-
-      const result = await query(
-        "SELECT * FROM users.sites WHERE id = $1 AND user_id = $2",
-        [id, context.user.id]
-      );
-
-      if (result.rows.length === 0) {
-        throw new Error("Website not found or access denied");
-      }
-
-      const website = result.rows[0];
-      const isActive = true;
-
-      await query(
-        "UPDATE users.sites SET active = $1, last_active_date = NOW() WHERE id = $2",
-        [isActive, id]
-      );
-
-      return { ...website, active: isActive, last_active_date: new Date() };
-    },
   },
 };
