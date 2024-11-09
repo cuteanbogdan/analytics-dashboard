@@ -18,7 +18,7 @@ CREATE TABLE analytics.visitor_stats (
   tracking_id UUID REFERENCES users.sites(tracking_id) ON DELETE CASCADE,
   visitor_id UUID DEFAULT uuid_generate_v4(),
   device_type VARCHAR(50),                  
-  location JSONB,                           
+  location TEXT,                           
   visit_count INT DEFAULT 1,
   first_visit TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   last_visit TIMESTAMP DEFAULT CURRENT_TIMESTAMP
