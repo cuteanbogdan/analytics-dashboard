@@ -16,7 +16,7 @@ CREATE TABLE analytics.page_views (
 CREATE TABLE analytics.visitor_stats (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   tracking_id UUID REFERENCES users.sites(tracking_id) ON DELETE CASCADE,
-  visitor_id UUID DEFAULT uuid_generate_v4(),
+  visitor_id TEXT,
   device_type VARCHAR(50),                  
   location TEXT,                           
   visit_count INT DEFAULT 1,
