@@ -86,8 +86,6 @@ export const addWebsiteAsync = createAsyncThunk(
         variables: website,
       });
 
-      dispatch(fetchWebsitesAsync());
-
       return data.addWebsite;
     } catch (error: any) {
       if (
@@ -100,8 +98,6 @@ export const addWebsiteAsync = createAsyncThunk(
             mutation: ADD_WEBSITE,
             variables: website,
           });
-
-          dispatch(fetchWebsitesAsync());
 
           return data.addWebsite;
         } else {
