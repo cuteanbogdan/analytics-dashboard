@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/redux/store";
 import { fetchWebsitesAsync } from "@/redux/slices/websitesSlice";
+import Link from "next/link";
 
 const WebsiteList: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -26,9 +27,9 @@ const WebsiteList: React.FC = () => {
         <ul className="space-y-2">
           {websites.map((site) => (
             <li key={site.id} className="text-indigo-600 hover:underline">
-              <a href={site.site_url} target="_blank" rel="noopener noreferrer">
+              <Link href={`/website/${site.tracking_id}`}>
                 {site.site_name}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
