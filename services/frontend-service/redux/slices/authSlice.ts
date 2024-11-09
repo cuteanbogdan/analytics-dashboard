@@ -4,18 +4,7 @@ import {
   refreshTokenService,
   logoutService,
 } from "@/services/authService";
-
-interface User {
-  id: string;
-  email: string;
-  fullName?: string;
-}
-
-interface AuthState {
-  isAuthenticated: boolean;
-  user: User | null;
-  accessToken: string | null;
-}
+import { AuthState, User } from "../interfaces/Auth";
 
 const initialState: AuthState = {
   isAuthenticated: false,
