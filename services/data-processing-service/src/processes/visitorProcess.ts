@@ -26,9 +26,9 @@ export const processVisitorStats = async (
       `
       UPDATE analytics.visitor_stats
       SET visit_count = visit_count + 1,
-          last_visit = $3,
-          device_type = $4,
-          location = $5
+          last_visit = $2,
+          device_type = $3,
+          location = $4
       WHERE id = $1
     `,
       [existingVisitor.id, new Date(), deviceInfo, JSON.stringify(location)]
