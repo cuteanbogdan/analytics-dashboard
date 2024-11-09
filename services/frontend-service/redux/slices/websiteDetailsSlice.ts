@@ -120,7 +120,6 @@ const websiteDetailsSlice = createSlice({
       })
       .addCase(fetchVisitorStatsAsync.fulfilled, (state, action) => {
         state.visitorStats = action.payload;
-        console.log(action.payload);
       })
       .addCase(fetchSessionsAsync.fulfilled, (state, action) => {
         state.sessions = action.payload;
