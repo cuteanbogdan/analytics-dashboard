@@ -1,30 +1,13 @@
 "use client";
-import { gql, useQuery } from "@apollo/client";
+import { RootState } from "@/redux/store";
+import { useSelector } from "react-redux";
 
-const GET_PAGE_VIEWS = gql`
-  query GetPageViews($tracking_id: ID!) {
-    getPageViews(tracking_id: $tracking_id) {
-      id
-      tracking_id
-      timestamp
-      page_url
-      views_count
-      unique_visitors
-      average_time_on_page
-      bounce_rate
-    }
-  }
-`;
-
-const PageViews = ({ trackingId }: { trackingId: string }) => {
-  const { data, loading, error } = useQuery(GET_PAGE_VIEWS, {
-    variables: { tracking_id: trackingId },
-  });
+const PageViews = () => {
+  const { pageViews, loading } = useSelector(
+    (state: RootState) => state.websiteDetails
+  );
 
   if (loading) return <p>Loading Page Views...</p>;
-  if (error) return <p>Error loading page views.</p>;
-
-  const pageViews = data?.getPageViews;
 
   return (
     <div className="p-4 bg-gray-100 rounded-lg shadow">
@@ -35,7 +18,10 @@ const PageViews = ({ trackingId }: { trackingId: string }) => {
             <p>Page URL: {view.page_url}</p>
             <p>Views: {view.views_count}</p>
             <p>Unique Visitors: {view.unique_visitors}</p>
-            <p>Average Time on Page: {view.average_time_on_page || "N/A"}</p>
+            <p>
+              Average Time on Page:{" "}
+              {view.average_time_on_page / 60 + " mins" || "N/A"}
+            </p>
             <p>
               Bounce Rate: {view.bounce_rate ? `${view.bounce_rate}%` : "N/A"}
             </p>

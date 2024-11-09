@@ -1,31 +1,19 @@
 "use client";
-import { gql, useQuery } from "@apollo/client";
+import { RootState } from "@/redux/store";
+import { useSelector } from "react-redux";
 
-const GET_SESSIONS = gql`
-  query GetPageSessions($tracking_id: ID!, $page_url: String) {
-    getPageSessions(tracking_id: $tracking_id, page_url: $page_url) {
-      id
-      tracking_id
-      page_url
-      session_start
-      session_end
-    }
-  }
-`;
-
-const Sessions = ({ trackingId }: { trackingId: string }) => {
-  const { data, loading, error } = useQuery(GET_SESSIONS, {
-    variables: { tracking_id: trackingId },
-  });
+const Sessions = () => {
+  const { sessions, loading } = useSelector(
+    (state: RootState) => state.websiteDetails
+  );
 
   if (loading) return <p>Loading Sessions...</p>;
-  if (error) return <p>Error loading sessions.</p>;
 
   return (
     <div className="p-4 bg-gray-100 rounded-lg shadow">
       <h2 className="text-xl font-semibold text-gray-800 mb-2">Sessions</h2>
-      {data?.getPageSessions?.length > 0 ? (
-        data.getPageSessions.map((session: any, index: number) => (
+      {sessions && sessions.length > 0 ? (
+        sessions.map((session: any, index: number) => (
           <div key={index}>
             <p>Session Start: {session.session_start}</p>
             <p>Session End: {session.session_end}</p>
