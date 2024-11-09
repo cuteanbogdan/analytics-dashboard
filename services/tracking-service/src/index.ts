@@ -3,6 +3,8 @@ import cors from "cors";
 import { PORT } from "./config";
 import { connectToRabbitMQ, publishToQueue } from "./queue";
 import { TrackingData } from "shared-types/dist/trackingData";
+import { checkConnection } from "shared-config/dist/db";
+import { trackingDataSchema, isValidTrackingId } from "./validators";
 
 const app = express();
 
@@ -26,10 +28,20 @@ app.use(express.json());
 const TRACKING_QUEUE = "tracking_data_queue";
 
 app.post("/track", async (req: Request, res: Response): Promise<void> => {
-  const trackingData: TrackingData = req.body;
+  const trackingData: TrackingData = {
+    ...req.body,
+    ipAddress: req.ip,
+  };
 
-  if (!trackingData.trackingId) {
-    res.status(400).json({ error: "Missing trackingId" });
+  const { error } = trackingDataSchema.validate(trackingData);
+  if (error) {
+    res.status(400).json({ error: `Validation error: ${error.message}` });
+    return;
+  }
+
+  const isValid = await isValidTrackingId(trackingData.trackingId);
+  if (!isValid) {
+    res.status(404).json({ error: "Invalid trackingId" });
     return;
   }
 
@@ -42,7 +54,17 @@ app.post("/track", async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-app.listen(PORT, async (): Promise<void> => {
-  console.log(`Tracking Service is running on port ${PORT}`);
-  await connectToRabbitMQ();
-});
+const startServer = async (): Promise<void> => {
+  try {
+    await checkConnection("Tracking Service");
+    await connectToRabbitMQ();
+    app.listen(PORT, () => {
+      console.log(`Tracking Service is running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Failed to start Tracking Service:", error);
+    process.exit(1);
+  }
+};
+
+startServer();
