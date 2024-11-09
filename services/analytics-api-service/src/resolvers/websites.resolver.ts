@@ -7,19 +7,44 @@ interface AddWebsiteArgs {
 
 export const websitesResolvers = {
   Query: {
-    getWebsites: async () => {
+    getWebsites: async (
+      _: unknown,
+      __: unknown,
+      context: { user?: { id: string } }
+    ) => {
+      if (!context.user || !context.user.id) {
+        throw new Error("User not authenticated");
+      }
+
       try {
-        const result = await query("SELECT * FROM users.sites");
+        const result = await query(
+          "SELECT * FROM users.sites WHERE user_id = $1",
+          [context.user.id]
+        );
         return result.rows || [];
       } catch (error) {
         console.error("Error fetching websites:", error);
         return [];
       }
     },
-    getWebsiteByID: async (_: unknown, { id }: { id: string }) => {
-      const result = await query("SELECT * FROM users.sites WHERE id = $1", [
-        id,
-      ]);
+    getWebsiteByTrackingID: async (
+      _: unknown,
+      { tracking_id }: { tracking_id: string },
+      context: { user?: { id: string } }
+    ) => {
+      if (!context.user || !context.user.id) {
+        throw new Error("User not authenticated");
+      }
+
+      const result = await query(
+        "SELECT * FROM users.sites WHERE tracking_id = $1 AND user_id = $2",
+        [tracking_id, context.user.id]
+      );
+
+      if (result.rows.length === 0) {
+        throw new Error("Website not found or access denied");
+      }
+
       return result.rows[0];
     },
   },
@@ -63,23 +88,34 @@ export const websitesResolvers = {
       return result.rows[0];
     },
 
-    checkWebsiteStatus: async (_: unknown, { id }: { id: string }) => {
-      // only template
-      const result = await query("SELECT * FROM users.sites WHERE id = $1", [
-        id,
-      ]);
-
-      if (result.rows.length > 0) {
-        const website = result.rows[0];
-        const isActive = true;
-        await query(
-          "UPDATE users.sites SET active = $1, last_active_date = NOW() WHERE id = $2",
-          [isActive, id]
-        );
-
-        return { ...website, active: isActive, lastActiveDate: new Date() };
+    checkWebsiteStatus: async (
+      // template only
+      _: unknown,
+      { id }: { id: string },
+      context: { user?: { id: string } }
+    ) => {
+      if (!context.user || !context.user.id) {
+        throw new Error("User not authenticated");
       }
-      throw new Error("Website not found");
+
+      const result = await query(
+        "SELECT * FROM users.sites WHERE id = $1 AND user_id = $2",
+        [id, context.user.id]
+      );
+
+      if (result.rows.length === 0) {
+        throw new Error("Website not found or access denied");
+      }
+
+      const website = result.rows[0];
+      const isActive = true;
+
+      await query(
+        "UPDATE users.sites SET active = $1, last_active_date = NOW() WHERE id = $2",
+        [isActive, id]
+      );
+
+      return { ...website, active: isActive, last_active_date: new Date() };
     },
   },
 };

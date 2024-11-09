@@ -11,7 +11,7 @@ type Website {
 
 type Query {
   getWebsites: [Website!]!
-  getWebsiteByID(id: ID!): Website
+  getWebsiteByTrackingID(tracking_id: String!): Website
 }
 
 type Mutation {
