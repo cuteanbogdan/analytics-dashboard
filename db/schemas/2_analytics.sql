@@ -26,6 +26,7 @@ CREATE TABLE analytics.visitor_stats (
 
 CREATE TABLE analytics.page_sessions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  session_token UUID NOT NULL,
   tracking_id UUID REFERENCES users.sites(tracking_id) ON DELETE CASCADE,
   page_url TEXT,
   session_start TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

@@ -5,10 +5,19 @@
   const urlParams = new URLSearchParams(script.src.split("?")[1]);
   const tracking_id = urlParams.get("tracking_id");
 
+  let sessionToken = localStorage.getItem("sessionToken");
+  if (!sessionToken) {
+    sessionToken = crypto.randomUUID();
+    localStorage.setItem("sessionToken", sessionToken);
+  }
+
+  let lastTrackedUrl = window.location.href;
+
   const trackingData = {
     trackingId: tracking_id,
+    sessionToken: sessionToken,
     eventType: "pageview",
-    pageUrl: window.location.href,
+    pageUrl: lastTrackedUrl,
     referrer: document.referrer,
     userAgent: navigator.userAgent,
     customData: {},
@@ -29,5 +38,32 @@
       .catch((error) => console.error("Error sending tracking data:", error));
   }
 
-  window.addEventListener("load", sendTrackingData);
+  function trackPageView() {
+    const currentUrl = window.location.href;
+    if (currentUrl !== lastTrackedUrl) {
+      trackingData.pageUrl = currentUrl;
+      trackingData.eventType = "pageview";
+      lastTrackedUrl = currentUrl;
+      sendTrackingData();
+    }
+  }
+
+  sendTrackingData();
+
+  // Track changes in page view in SPAs
+  window.addEventListener("popstate", trackPageView);
+  window.addEventListener("hashchange", trackPageView);
+  setInterval(trackPageView, 1000);
+
+  // Clear session token when all tabs are closed
+  window.addEventListener("unload", () => {
+    const cleanupTimeout = 100;
+    setTimeout(() => {
+      if (!document.hasFocus()) {
+        localStorage.removeItem("sessionToken");
+      }
+    }, cleanupTimeout);
+  });
+
+  console.log("Tracking script initialized with config:", trackingData);
 })();
