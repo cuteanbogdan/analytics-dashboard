@@ -3,6 +3,7 @@ import { query } from "shared-config/dist/db";
 
 export const trackingDataSchema = Joi.object({
   trackingId: Joi.string().uuid().required(),
+  sessionToken: Joi.string().uuid().required(),
   eventType: Joi.string().valid("pageview", "click", "form_submit").required(),
   pageUrl: Joi.string().uri().required(),
   referrer: Joi.string().uri().allow("").optional(),
