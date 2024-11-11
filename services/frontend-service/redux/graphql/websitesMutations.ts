@@ -6,6 +6,10 @@ export const ADD_WEBSITE = gql`
       id
       site_name
       site_url
+      active
+      tracking_id
+      last_active_date
+      created_at
     }
   }
 `;

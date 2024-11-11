@@ -10,7 +10,7 @@ const StatsSummary: React.FC = () => {
   const inactiveWebsites = totalWebsites - activeWebsites;
 
   const recentlyAddedWebsites = websites.filter((site) => {
-    const createdAt = new Date(site.created_at);
+    const createdAt = new Date(parseInt(site.created_at, 10));
     const now = new Date();
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(now.getDate() - 30);
