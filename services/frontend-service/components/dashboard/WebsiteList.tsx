@@ -7,7 +7,7 @@ import {
   editWebsiteAsync,
 } from "@/redux/slices/websitesSlice";
 import Link from "next/link";
-import { FaEdit, FaTrashAlt, FaCheck } from "react-icons/fa";
+import { FaEdit, FaTrashAlt, FaCheck, FaEye } from "react-icons/fa";
 import { selectFilteredWebsites } from "@/redux/utils";
 
 const WebsiteList: React.FC = () => {
@@ -52,9 +52,9 @@ const WebsiteList: React.FC = () => {
           {websites.map((site) => (
             <div
               key={site.id}
-              className="bg-gray-50 p-4 rounded-lg shadow-lg w-full sm:w-1/2 md:w-1/3 lg:w-1/4 flex flex-col items-start border border-gray-200"
+              className="bg-gray-50 p-4 rounded-lg shadow-lg w-full sm:w-1/2 md:w-1/3 lg:w-1/4 flex flex-col items-start border border-gray-200 transition-transform transform hover:scale-105"
             >
-              <div className="flex-1 w-full">
+              <div className="flex-1 w-full mb-2">
                 {editMode[site.id] ? (
                   <input
                     type="text"
@@ -83,7 +83,15 @@ const WebsiteList: React.FC = () => {
                   Status: {site.active ? "Active" : "Inactive"}
                 </p>
               </div>
-              <div className="flex w-full justify-between mt-3">
+              <div className="flex justify-between w-full mt-3">
+                <Link
+                  className="flex items-center justify-center w-full px-2 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                  href={`/website/${site.tracking_id}`}
+                >
+                  <FaEye className="mr-2" /> View Stats
+                </Link>
+              </div>
+              <div className="flex w-full justify-between mt-3 space-x-2">
                 {editMode[site.id] ? (
                   <button
                     onClick={() => handleSave(site.id)}
