@@ -12,4 +12,5 @@ export interface WebsitesState {
   websites: Website[];
   loading: boolean;
   error: string | null;
+  filterStatus: "all" | "active" | "inactive";
 }

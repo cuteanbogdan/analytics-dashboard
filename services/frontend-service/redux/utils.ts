@@ -1,5 +1,5 @@
 import { refreshAuthState } from "./slices/authSlice";
-import type { AppDispatch } from "./store";
+import type { AppDispatch, RootState } from "./store";
 
 export const handleTokenExpiration = async (
   query: () => Promise<any>,
@@ -21,4 +21,14 @@ export const handleTokenExpiration = async (
     }
     throw error;
   }
+};
+
+export const selectFilteredWebsites = (state: RootState) => {
+  const { websites, filterStatus } = state.websites;
+  if (filterStatus === "active") {
+    return websites.filter((site) => site.active);
+  } else if (filterStatus === "inactive") {
+    return websites.filter((site) => !site.active);
+  }
+  return websites;
 };

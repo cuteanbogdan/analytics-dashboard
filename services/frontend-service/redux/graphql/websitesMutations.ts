@@ -9,3 +9,23 @@ export const ADD_WEBSITE = gql`
     }
   }
 `;
+
+export const EDIT_WEBSITE = gql`
+  mutation EditWebsite($id: ID!, $site_name: String!) {
+    editWebsite(id: $id, site_name: $site_name) {
+      id
+      site_name
+      site_url
+      active
+      tracking_id
+      last_active_date
+      created_at
+    }
+  }
+`;
+
+export const DELETE_WEBSITE = gql`
+  mutation deleteWebsite($id: ID!) {
+    deleteWebsite(id: $id)
+  }
+`;
