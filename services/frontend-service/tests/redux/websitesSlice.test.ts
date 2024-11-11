@@ -2,6 +2,9 @@ import { createMockStore, MockStore } from "../mocks/mockStore";
 import {
   fetchWebsitesAsync,
   addWebsiteAsync,
+  deleteWebsiteAsync,
+  editWebsiteAsync,
+  setFilterStatus,
 } from "@/redux/slices/websitesSlice";
 import { RootState } from "@/redux/store";
 import client from "@/apollo/client";
@@ -25,7 +28,12 @@ describe("Websites Slice", () => {
 
   beforeEach(() => {
     store = createMockStore({
-      websites: { websites: [], loading: false, error: null },
+      websites: {
+        websites: [],
+        loading: false,
+        error: null,
+        filterStatus: "all",
+      },
     });
     jest.clearAllMocks();
   });
@@ -92,5 +100,77 @@ describe("Websites Slice", () => {
     const state = store.getState() as RootState;
     expect(state.websites.loading).toBe(false);
     expect(state.websites.error).toBe("Failed to add website");
+  });
+
+  it("should edit a website and update state on success", async () => {
+    const updatedWebsite = { id: "1", site_name: "Updated Name" };
+    // Set initial state with a website entry that can be edited
+    store = createMockStore({
+      websites: {
+        websites: mockWebsites,
+        loading: false,
+        error: null,
+        filterStatus: "all",
+      },
+    });
+    (client.mutate as jest.Mock).mockResolvedValue({
+      data: { editWebsite: updatedWebsite },
+    });
+
+    await store.dispatch(editWebsiteAsync(updatedWebsite));
+
+    const state = store.getState() as RootState;
+    expect(state.websites.websites.find((w) => w.id === "1")?.site_name).toBe(
+      "Updated Name"
+    );
+    expect(state.websites.loading).toBe(false);
+    expect(state.websites.error).toBe(null);
+  });
+
+  it("should handle errors during edit website", async () => {
+    (client.mutate as jest.Mock).mockRejectedValue(new Error("Edit failed"));
+
+    await store.dispatch(editWebsiteAsync({ id: "1", site_name: "Fail Edit" }));
+
+    const state = store.getState() as RootState;
+    expect(state.websites.loading).toBe(false);
+    expect(state.websites.error).toBe("Failed to edit website");
+  });
+
+  it("should delete a website and update state on success", async () => {
+    (client.mutate as jest.Mock).mockResolvedValue({
+      data: { deleteWebsite: true },
+    });
+
+    await store.dispatch(deleteWebsiteAsync("1"));
+
+    const state = store.getState() as RootState;
+    expect(state.websites.websites.find((w) => w.id === "1")).toBeUndefined();
+    expect(state.websites.loading).toBe(false);
+    expect(state.websites.error).toBe(null);
+  });
+
+  it("should handle errors during delete website", async () => {
+    (client.mutate as jest.Mock).mockRejectedValue(new Error("Delete failed"));
+
+    await store.dispatch(deleteWebsiteAsync("1"));
+
+    const state = store.getState() as RootState;
+    expect(state.websites.loading).toBe(false);
+    expect(state.websites.error).toBe("Failed to delete website");
+  });
+
+  it("should filter websites by status", () => {
+    store.dispatch(setFilterStatus("active"));
+    let state = store.getState() as RootState;
+    expect(state.websites.filterStatus).toBe("active");
+
+    store.dispatch(setFilterStatus("inactive"));
+    state = store.getState() as RootState;
+    expect(state.websites.filterStatus).toBe("inactive");
+
+    store.dispatch(setFilterStatus("all"));
+    state = store.getState() as RootState;
+    expect(state.websites.filterStatus).toBe("all");
   });
 });
