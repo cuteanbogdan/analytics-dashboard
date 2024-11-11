@@ -5,6 +5,11 @@ interface AddWebsiteArgs {
   site_url: string;
 }
 
+interface EditWebsiteArgs {
+  id: string;
+  site_name: string;
+}
+
 export const websitesResolvers = {
   Query: {
     getWebsites: async (
@@ -86,6 +91,57 @@ export const websitesResolvers = {
       );
 
       return result.rows[0];
+    },
+
+    editWebsite: async (
+      _: unknown,
+      { id, site_name }: EditWebsiteArgs,
+      context: { user?: { id: string } }
+    ) => {
+      if (!context.user || !context.user.id) {
+        throw new Error("User not authenticated");
+      }
+
+      const websiteCheck = await query(
+        "SELECT * FROM users.sites WHERE id = $1 AND user_id = $2",
+        [id, context.user.id]
+      );
+
+      if (websiteCheck.rows.length === 0) {
+        throw new Error("Website not found or access denied");
+      }
+
+      const result = await query(
+        `UPDATE users.sites 
+         SET site_name = $1 
+         WHERE id = $2 
+         RETURNING *`,
+        [site_name, id]
+      );
+
+      return result.rows[0];
+    },
+
+    deleteWebsite: async (
+      _: unknown,
+      { id }: { id: string },
+      context: { user?: { id: string } }
+    ) => {
+      if (!context.user || !context.user.id) {
+        throw new Error("User not authenticated");
+      }
+
+      const websiteCheck = await query(
+        "SELECT * FROM users.sites WHERE id = $1 AND user_id = $2",
+        [id, context.user.id]
+      );
+
+      if (websiteCheck.rows.length === 0) {
+        throw new Error("Website not found or access denied");
+      }
+
+      await query("DELETE FROM users.sites WHERE id = $1", [id]);
+      return true;
     },
   },
 };

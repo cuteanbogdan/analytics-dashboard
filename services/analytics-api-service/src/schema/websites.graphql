@@ -16,4 +16,6 @@ type Query {
 
 type Mutation {
   addWebsite(site_name: String!, site_url: String!): Website!
+  editWebsite(id: ID!, site_name: String!): Website!
+  deleteWebsite(id: ID!): Boolean!
 }
