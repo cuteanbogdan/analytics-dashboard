@@ -1,8 +1,8 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useAppDispatch } from "@/redux/hooks";
-import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 import {
   fetchPageViewsAsync,
   fetchSessionsAsync,
@@ -13,8 +13,13 @@ import {
 import VisitorStats from "@/components/websiteDetails/VisitorStats";
 import PageViews from "@/components/websiteDetails/PageViews";
 import Sessions from "@/components/websiteDetails/Sessions";
-import { RootState } from "@/redux/store";
+import { FaSyncAlt, FaCode, FaClipboard } from "react-icons/fa";
 import { useAuth } from "@/hooks/useAuth";
+import { useSelector } from "react-redux";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/swiper-bundle.css";
+import { Navigation, Pagination } from "swiper/modules";
+import "swiper/swiper-bundle.css";
 
 const WebsiteDetailsPage = () => {
   const { id } = useParams();
@@ -22,9 +27,12 @@ const WebsiteDetailsPage = () => {
   const isAuthenticated = useAuth();
 
   const dispatch = useAppDispatch();
-  const { details, loading, error } = useSelector(
-    (state: RootState) => state.websiteDetails
-  );
+  const { details, pageViews, sessions, visitorStats, loading, error } =
+    useSelector((state: RootState) => state.websiteDetails);
+
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [copySuccess, setCopySuccess] = useState("");
+  const [showFullScript, setShowFullScript] = useState(false);
 
   useEffect(() => {
     if (tracking_id) {
@@ -38,56 +46,162 @@ const WebsiteDetailsPage = () => {
     };
   }, [dispatch, tracking_id]);
 
-  const handleRefreshStatus = async () => {
+  const handleRefreshStatus = () => {
     dispatch(fetchWebsiteDetailsAsync(tracking_id));
     dispatch(fetchPageViewsAsync(tracking_id));
     dispatch(fetchVisitorStatsAsync(tracking_id));
     dispatch(fetchSessionsAsync(tracking_id));
   };
-  if (!isAuthenticated) {
-    return null;
-  }
 
+  const handleOpenModal = () => setModalOpen(true);
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setShowFullScript(false);
+    setCopySuccess("");
+  };
+
+  const handleCopyScript = () => {
+    navigator.clipboard.writeText(embedScript).then(() => {
+      setCopySuccess("Script copied to clipboard!");
+      setTimeout(() => setCopySuccess(""), 2000);
+    });
+  };
+
+  const embedScript = `<script src="https://example.com/track.js?tracking_id=${tracking_id}" defer></script>`;
+  const truncatedScript = `<script src="https://example.com/track.js?..." defer></script>`;
+
+  if (!isAuthenticated) return null;
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error loading website details: {error}</p>;
 
+  const totalViews = pageViews.reduce(
+    (total, page) => total + (page.views_count || 0),
+    0
+  );
+  const uniqueVisitors = visitorStats.length;
+  const bounceRate = "0";
+
   return (
-    <div className="p-6 max-w-4xl mx-auto bg-white shadow-md rounded-lg space-y-6">
-      <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
+    <div className="p-6 max-w-7xl mx-auto bg-gray-100 min-h-screen">
+      <header className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-800">
+          <h1 className="text-3xl font-bold text-gray-800">
             {details?.site_name}
           </h1>
-          <p className="text-gray-600">Tracking ID: {details?.tracking_id}</p>
-          <a
-            href={details?.site_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-indigo-500 hover:underline"
-          >
-            {details?.site_url}
-          </a>
+          <p className="text-sm text-gray-500">
+            Last Updated: {new Date().toLocaleString()}
+          </p>
           <p
             className={`text-sm ${
-              details?.active ? "text-green-500" : "text-red-500"
+              details?.active ? "text-green-600" : "text-red-600"
             }`}
           >
-            Status: {details?.active ? "Active" : "Inactive"}
+            Status: {details?.active ? "Active" : "Not Active"}
           </p>
         </div>
-        <button
-          onClick={handleRefreshStatus}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-        >
-          Refresh Status
-        </button>
-      </div>
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={handleRefreshStatus}
+            className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+          >
+            <FaSyncAlt className="mr-2" /> Refresh
+          </button>
+          <button
+            onClick={handleOpenModal}
+            className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+          >
+            <FaCode className="mr-2" /> Get Script
+          </button>
+        </div>
+      </header>
 
-      <div className="space-y-4">
-        <VisitorStats />
-        <PageViews />
-        <Sessions />
-      </div>
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="bg-white p-4 rounded-lg shadow-md text-center">
+          <p className="text-gray-600">Total Views</p>
+          <p className="text-2xl font-bold text-indigo-600">
+            {totalViews || "N/A"}
+          </p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-md text-center">
+          <p className="text-gray-600">Unique Visitors</p>
+          <p className="text-2xl font-bold text-green-600">
+            {uniqueVisitors || "N/A"}
+          </p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-md text-center">
+          <p className="text-gray-600">Bounce Rate</p>
+          <p className="text-2xl font-bold text-red-600">
+            {bounceRate ? `${bounceRate}%` : "N/A"}
+          </p>
+        </div>
+      </section>
+
+      <Swiper
+        spaceBetween={30}
+        slidesPerView={1}
+        pagination={{ clickable: true }}
+        navigation
+        modules={[Navigation, Pagination]}
+      >
+        <SwiperSlide>
+          <div className="p-6 bg-white rounded-lg shadow-lg max-w-full h-80 overflow-auto">
+            <VisitorStats />
+          </div>
+        </SwiperSlide>
+        <SwiperSlide>
+          <div className="p-6 bg-white rounded-lg shadow-lg max-w-full h-80 overflow-auto">
+            <PageViews />
+          </div>
+        </SwiperSlide>
+        <SwiperSlide>
+          <div className="p-6 bg-white rounded-lg shadow-lg max-w-full h-80 overflow-auto">
+            <Sessions />
+          </div>
+        </SwiperSlide>
+      </Swiper>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-2xl w-full">
+            <h2 className="text-2xl font-bold mb-4">Embed Script</h2>
+            <p className="mb-4">
+              Copy and paste the script below into the{" "}
+              <strong>{`<body>`}</strong> section of your website to activate
+              tracking:
+            </p>
+            <div className="bg-gray-100 p-3 rounded text-sm mb-4 overflow-x-auto whitespace-pre-wrap">
+              <pre className="break-words">
+                {showFullScript ? (
+                  <code>{`<script src="https://example.com/track.js?tracking_id=${tracking_id}" defer></script>`}</code>
+                ) : (
+                  <code>{truncatedScript}</code>
+                )}
+              </pre>
+              <span
+                onClick={() => setShowFullScript(!showFullScript)}
+                className="text-blue-500 ml-2 cursor-pointer"
+              >
+                {showFullScript ? "Show less" : "Show more"}
+              </span>
+            </div>
+            <button
+              onClick={handleCopyScript}
+              className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            >
+              <FaClipboard className="mr-2" /> Copy Script
+            </button>
+            {copySuccess && (
+              <p className="text-green-600 text-sm mt-2">{copySuccess}</p>
+            )}
+            <button
+              onClick={handleCloseModal}
+              className="mt-4 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
