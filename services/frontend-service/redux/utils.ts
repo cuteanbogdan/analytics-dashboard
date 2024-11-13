@@ -32,3 +32,19 @@ export const selectFilteredWebsites = (state: RootState) => {
   }
   return websites;
 };
+
+export const formatTimestamp = (timestamp: number) => {
+  const date = new Date(timestamp);
+  const formattedDate = date.toLocaleDateString("en-US", {
+    month: "2-digit",
+    day: "2-digit",
+    year: "numeric",
+  });
+  const formattedTime = date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+  return `${formattedDate} - ${formattedTime}`;
+};
