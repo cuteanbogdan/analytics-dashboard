@@ -84,7 +84,14 @@ const WebsiteDetailsPage = () => {
     0
   );
   const uniqueVisitors = visitorStats.length;
-  const bounceRate = "0";
+  const weightedBounceSum = pageViews.reduce((total, page: any) => {
+    const pageBounceRate = page.bounce_rate || 0;
+    const pageViewsCount = page.views_count || 0;
+    return total + pageBounceRate * pageViewsCount;
+  }, 0);
+
+  const averageBounceRate =
+    totalViews > 0 ? (weightedBounceSum / totalViews).toFixed(2) : "0";
 
   return (
     <div className="p-6 max-w-7xl mx-auto bg-gray-100 min-h-screen">
@@ -136,7 +143,7 @@ const WebsiteDetailsPage = () => {
         <div className="bg-white p-4 rounded-lg shadow-md text-center">
           <p className="text-gray-600">Bounce Rate</p>
           <p className="text-2xl font-bold text-red-600">
-            {bounceRate ? `${bounceRate}%` : "N/A"}
+            {averageBounceRate ? `${averageBounceRate}%` : "N/A"}
           </p>
         </div>
       </section>
