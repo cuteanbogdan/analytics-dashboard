@@ -37,7 +37,7 @@ const VisitorStats = () => {
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="h-[40%] overflow-y-auto">
               {visitorStats.map((visitor: any, index: number) => (
                 <tr
                   key={index}

@@ -36,7 +36,7 @@ const PageViews = () => {
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="h-[40%] overflow-y-auto">
               {pageViews.map((view: any, index: number) => (
                 <tr
                   key={index}

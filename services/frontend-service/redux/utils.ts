@@ -48,3 +48,22 @@ export const formatTimestamp = (timestamp: number) => {
 
   return `${formattedDate} - ${formattedTime}`;
 };
+
+type TrendData = {
+  [key: string]: any;
+};
+
+export const processTrendData = (data: TrendData[], timestampField: string) => {
+  const countsByDate = data.reduce((acc: Record<string, number>, item) => {
+    const date = new Date(Number(item[timestampField])).toLocaleDateString(
+      "en-US"
+    );
+    acc[date] = (acc[date] || 0) + 1;
+    return acc;
+  }, {});
+
+  return Object.entries(countsByDate).map(([date, count]) => ({
+    date,
+    count,
+  }));
+};

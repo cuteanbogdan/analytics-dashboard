@@ -34,7 +34,7 @@ const Sessions = () => {
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="h-[40%] overflow-y-auto">
               {sessions.map((session: any, index: number) => (
                 <tr
                   key={index}

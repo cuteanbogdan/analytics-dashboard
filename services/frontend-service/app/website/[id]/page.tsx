@@ -19,7 +19,8 @@ import { useSelector } from "react-redux";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/swiper-bundle.css";
 import { Navigation, Pagination } from "swiper/modules";
-import "swiper/swiper-bundle.css";
+import TrendsChart from "@/components/websiteDetails/TrendsChart";
+import { processTrendData } from "@/redux/utils";
 
 const WebsiteDetailsPage = () => {
   const { id } = useParams();
@@ -52,6 +53,10 @@ const WebsiteDetailsPage = () => {
     dispatch(fetchVisitorStatsAsync(tracking_id));
     dispatch(fetchSessionsAsync(tracking_id));
   };
+
+  const visitorTrendData = processTrendData(visitorStats, "first_visit");
+  const pageViewTrendData = processTrendData(pageViews, "timestamp");
+  const sessionTrendData = processTrendData(sessions, "session_start");
 
   const handleOpenModal = () => setModalOpen(true);
   const handleCloseModal = () => {
@@ -144,18 +149,48 @@ const WebsiteDetailsPage = () => {
         modules={[Navigation, Pagination]}
       >
         <SwiperSlide>
-          <div className="p-6 bg-white rounded-lg shadow-lg max-w-full h-80 overflow-auto">
+          <div className="p-6 bg-white rounded-lg shadow-lg max-w-full h-[70%] overflow-auto">
             <VisitorStats />
+            <div className="flex justify-center mt-4">
+              <div className="w-70 h-60 flex justify-center">
+                <TrendsChart
+                  data={visitorTrendData}
+                  label="Visitor Count"
+                  backgroundColor="rgba(99, 102, 241, 0.2)"
+                  borderColor="rgba(99, 102, 241, 1)"
+                />
+              </div>
+            </div>
           </div>
         </SwiperSlide>
         <SwiperSlide>
-          <div className="p-6 bg-white rounded-lg shadow-lg max-w-full h-80 overflow-auto">
+          <div className="p-6 bg-white rounded-lg shadow-lg max-w-full h-[70%] overflow-auto">
             <PageViews />
+            <div className="flex justify-center mt-4">
+              <div className="w-70 h-60 flex justify-center">
+                <TrendsChart
+                  data={pageViewTrendData}
+                  label="Page Views"
+                  backgroundColor="rgba(34, 197, 94, 0.2)"
+                  borderColor="rgba(34, 197, 94, 1)"
+                />
+              </div>
+            </div>
           </div>
         </SwiperSlide>
         <SwiperSlide>
-          <div className="p-6 bg-white rounded-lg shadow-lg max-w-full h-80 overflow-auto">
+          <div className="p-6 bg-white rounded-lg shadow-lg max-w-full h-[70%] overflow-auto">
             <Sessions />
+            <div className="flex justify-center mt-4">
+              <div className="w-70 h-60 flex justify-center">
+                <TrendsChart
+                  data={sessionTrendData}
+                  label="Sessions"
+                  backgroundColor="rgba(239, 68, 68, 0.2)"
+                  borderColor="rgba(239, 68, 68, 1)"
+                />
+              </div>
+            </div>
           </div>
         </SwiperSlide>
       </Swiper>
