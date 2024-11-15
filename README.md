@@ -16,7 +16,8 @@ This project is organized into a monorepo with multiple services:
 
 The platform follows a microservices architecture to ensure scalability, maintainability, and isolation of concerns. Below is an architectural diagram illustrating the interaction between components:
 
-![Architecture Diagram](https://github.com/yourusername/analytics-overview/blob/main/ArchitectureDiagram.PNG)
+![Architecture Diagram](https://github.com/user-attachments/assets/9a081ef0-8128-41c3-bd49-ece723a8b62a)
+
 
 ### Key Features
 
@@ -50,19 +51,23 @@ The platform follows a microservices architecture to ensure scalability, maintai
 
 ### Dashboard Page:
 
-![Dashboard Page](https://github.com/yourusername/analytics-overview/blob/main/DashboardPage.PNG)
+![Dashboard Page](https://github.com/user-attachments/assets/ebb366fd-fadb-42ba-bedd-3b34484efc06)
+
 
 ### Visitors Page:
 
-![Visitors Page](https://github.com/yourusername/analytics-overview/blob/main/VisitorsPage.PNG)
+![Visitors Page](https://github.com/user-attachments/assets/c4a0b41d-22e8-4e16-b826-90a1583c3d90)
+
 
 ### Page Views Page:
 
-![Page Views Page](https://github.com/yourusername/analytics-overview/blob/main/PageViewsPage.PNG)
+![Page Views Page](https://github.com/user-attachments/assets/3128d62e-7dc1-4653-b6a8-ac5a5906115b)
+
 
 ### Sessions Page:
 
-![Sessions Page](https://github.com/yourusername/analytics-overview/blob/main/SessionsPage.PNG)
+![Sessions Page](https://github.com/user-attachments/assets/3914353e-207a-4983-8c84-8412e2cefe4d)
+
 
 ## Environment Variables
 
@@ -107,8 +112,8 @@ IP_API_TOKEN=<ip_api_token>
 1. Clone the monorepo:
 
    ```bash
-   git clone https://github.com/yourusername/analytics-monorepo.git
-   cd analytics-monorepo
+   git clone https://github.com/cuteanbogdan/analytics-dashboard.git
+   cd analytics-dashboard
    ```
 
 2. Set up the `.env` file:
