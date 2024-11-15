@@ -62,8 +62,10 @@ export const processTrendData = (data: TrendData[], timestampField: string) => {
     return acc;
   }, {});
 
-  return Object.entries(countsByDate).map(([date, count]) => ({
-    date,
-    count,
-  }));
+  return Object.entries(countsByDate)
+    .map(([date, count]) => ({
+      date,
+      count,
+    }))
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 };
