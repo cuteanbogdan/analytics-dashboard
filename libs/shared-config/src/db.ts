@@ -13,13 +13,31 @@ const pool = new Pool({
   connectionString: POSTGRES_URL,
 });
 
-export const checkConnection = async (serviceName: string) => {
-  try {
-    await pool.connect();
-    console.log(`[${serviceName}] DB connected successfully`);
-  } catch (error) {
-    console.error(`[${serviceName}] DB connection error:`, error);
-    process.exit(1);
+export const checkConnection = async (
+  serviceName: string,
+  retries = 5,
+  delay = 5000
+): Promise<void> => {
+  while (retries > 0) {
+    try {
+      await pool.connect();
+      console.log(`[${serviceName}] DB connected successfully`);
+      return;
+    } catch (error) {
+      console.error(
+        `[${serviceName}] DB connection error. Retrying in ${
+          delay / 1000
+        } seconds...`,
+        error
+      );
+      retries -= 1;
+      if (retries === 0) {
+        throw new Error(
+          `[${serviceName}] Could not connect to DB after multiple attempts`
+        );
+      }
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
   }
 };
 
